@@ -24,7 +24,7 @@ const FiltersContainer = styled.div`
 
 const SearchBar = styled.input`
   padding: 10px;
-  width: 250px;
+  width: 170px;
   font-size: 1rem;
   border-radius: 5px;
   border: none;
@@ -54,7 +54,7 @@ const Collapser = styled.div`
 `;
 
 const CollapserHeader = styled.div`
-  background:#781F1F;
+  background: #781F1F;
   color: white;
   padding: 15px;
   font-size: 1.5rem;
@@ -75,33 +75,65 @@ const Variant = styled.div`
   justify-content: space-between;
   align-items: center;
   background: white;
-  padding: 8px;
+  padding: 10px;
   margin-bottom: 8px;
   border-radius: 5px;
+  gap: 10px;
+  flex-wrap: wrap;
+`;
+
+const VariantLeft = styled.div`
+  flex: 1;
+  text-align: left;
+`;
+
+const VariantRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 const Price = styled.p`
   font-size: 1.2rem;
   color: green;
   font-weight: bold;
-  margin-right: 20px;
+  margin: 0;
 `;
 
-const QuantityInput = styled.input`
-  width: 50px;
+const QuantityContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
+const QuantityButton = styled.button`
+  padding: 5px 10px;
+  font-size: 1rem;
+  background-color: #ccc;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
+const QuantityDisplay = styled.div`
+  width: 40px;
   text-align: center;
+  font-size: 1rem;
   padding: 5px;
-  margin-right: 20px;
+  background: #eee;
+  border-radius: 5px;
 `;
 
 const AddToCartButton = styled.button`
   background-color: #781F1F;
   color: white;
-  padding: 8px 12px;
+  padding: 8px 16px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
+  min-width: 120px;
+  text-align: center;
   &:hover {
     background-color: #333;
   }
@@ -325,25 +357,22 @@ const menuData = [
 ];
 
 const Menu = () => {
-  const [expanded, setExpanded] = useState({});
+  const [expandedId, setExpandedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
   const { setOrder } = useContext(OrderContext);
   const [quantities, setQuantities] = useState({});
 
   const toggleExpand = (id) => {
-    setExpanded((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setExpandedId((prevId) => (prevId === id ? null : id));
   };
 
-  const handleQuantityChange = (itemId, variantName, value) => {
-    if (value < 0) return;
-    setQuantities((prev) => ({
-      ...prev,
-      [`${itemId}-${variantName}`]: value,
-    }));
+  const handleQuantityChange = (itemId, variantName, delta) => {
+    const key = `${itemId}-${variantName}`;
+    setQuantities((prev) => {
+      const newQty = Math.max(0, (prev[key] || 0) + delta);
+      return { ...prev, [key]: newQty };
+    });
   };
 
   const handleAddToCart = (item, variant) => {
@@ -376,40 +405,65 @@ const Menu = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <Select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="All">All Categories</option>
+        <option value="All">All Categories</option>
+          <option value="Vada Pav">Vada Pav</option>
+          <option value="Sandwiches">Sandwiches</option>
+          <option value="Pizza">Pizza</option>
+          <option value="Bhajiya">Bhajiya</option>
+          <option value="Jain's Special">Jain's Special</option>
+          <option value="Chaat">Chaat</option>
+          <option value="Samosa">Samosa</option>
+          <option value="Fries">Fries</option>
+          <option value="Mumbaiya Bhel">Mumbaiya Bhel</option>
+          <option value="Chai">Chai</option>
+          <option value="Misal Pav">Misal Pav</option>
+          <option value="Cooler's">Cooler's</option>
           <option value="Refreshment">Refreshment</option>
+          <option value="Mojito">Mojito</option>
           <option value="Pav Bhaji">Pav Bhaji</option>
+          <option value="Chole Bhature">Chole Bhature</option>
+          <option value="Burger">Burger</option>
+          <option value="Pulao">Pulao</option>
+          <option value="Special's">Special's</option>
         </Select>
       </FiltersContainer>
-      <GridContainer>
-        {filteredItems.map((item) => (
-          <Collapser key={item._id}>
-            <CollapserHeader onClick={() => toggleExpand(item._id)}>
-              <span>{item.name}</span>
-              <span>{expanded[item._id] ? "▲" : "▼"}</span>
-            </CollapserHeader>
-            <CollapserContent isOpen={expanded[item._id]}>
-              {item.variants.map((variant) => (
-                <Variant key={variant.name}>
-                  <span>{variant.name}</span>
-                  <Price>₹{variant.price}</Price>
-                  <QuantityInput
-                    type="number"
-                    min="0"
-                    value={quantities[`${item._id}-${variant.name}`] || 0}
-                    onChange={(e) =>
-                      handleQuantityChange(item._id, variant.name, parseInt(e.target.value) || 0)
-                    }
-                  />
-                  <AddToCartButton onClick={() => handleAddToCart(item, variant)}>
-                    Add to Cart
-                  </AddToCartButton>
-                </Variant>
-              ))}
-            </CollapserContent>
-          </Collapser>
-        ))}
-      </GridContainer>
+      {filteredItems.length === 0 ? (
+        <p style={{ color: "white", fontSize: "1.2rem" }}>
+          No items found for the selected criteria.
+        </p>
+      ) : (
+        <GridContainer>
+          {filteredItems.map((item) => (
+            <Collapser key={item._id}>
+              <CollapserHeader onClick={() => toggleExpand(item._id)}>
+                <span>{item.name}</span>
+                <span>{expandedId === item._id ? "▲" : "▼"}</span>
+              </CollapserHeader>
+              <CollapserContent isOpen={expandedId === item._id}>
+              {item.variants.map((variant) => {
+                const key = `${item._id}-${variant.name}`;
+                  return (
+                    <Variant key={variant.name}>
+                      <VariantLeft>
+                        <strong>{variant.name}</strong>
+                      </VariantLeft>
+                      <VariantRight>
+                        <Price>₹{variant.price}</Price>
+                        <QuantityContainer>
+                          <QuantityButton onClick={() => handleQuantityChange(item._id, variant.name, -1)}>-</QuantityButton>
+                          <QuantityDisplay>{quantities[key] || 0}</QuantityDisplay>
+                          <QuantityButton onClick={() => handleQuantityChange(item._id, variant.name, 1)}>+</QuantityButton>
+                        </QuantityContainer>
+                        <AddToCartButton onClick={() => handleAddToCart(item, variant)}>Add to Cart</AddToCartButton>
+                      </VariantRight>
+                    </Variant>
+                  );
+                })}
+              </CollapserContent>
+            </Collapser>
+          ))}
+        </GridContainer>
+      )}
     </MenuContainer>
   );
 };
