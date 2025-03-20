@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import React, { useState, useContext } from "react";
 import { OrderContext } from "../Context/OrderContext";
 import styled from "styled-components";
 
@@ -81,12 +80,6 @@ const Variant = styled.div`
   border-radius: 5px;
 `;
 
-const VariantText = styled.p`
-  font-size: 1rem;
-  margin: 0;
-  flex: 1;
-`;
-
 const Price = styled.p`
   font-size: 1.2rem;
   color: green;
@@ -109,43 +102,234 @@ const AddToCartButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
-
   &:hover {
     background-color: #333;
   }
 `;
 
+const menuData = [
+  {
+    name: "Vada Pav",
+    category: "Vada Pav",
+    variants: [
+      { name: "Bombay Vada Pav", price: 25 },
+      { name: "Jain Vada Pav", price: 30 },
+      { name: "Jain Butter Grilled Vada Pav", price: 40 },
+      { name: "Amul Vada Pav", price: 30 },
+      { name: "Spicy Vada Pav", price: 35 },
+      { name: "Ulta Vada Pav", price: 35 },
+      { name: "Mayo Vada Pav", price: 50 },
+      { name: "Cheese Vada Pav", price: 40 },
+      { name: "Cheese Burst Vada Pav", price: 70 }
+    ],
+  },
+  {
+    name: "Sandwiches",
+    category: "Sandwiches",
+    variants: [
+      { name: "Bombay Kaccha", price: 50 },
+      { name: "Veg Grilled", price: 60 },
+      { name: "Bombay Masala Grilled", price: 60 },
+      { name: "Cheese Chutney", price: 80 },
+      { name: "Bumbaiya Club", price: 120 },
+      { name: "Tandoori Paneer", price: 120 },
+      { name: "Pizza Sandwiches", price: 120 },
+      { name: "Jungle Sandwiches", price: 120 },
+      { name: "Veg Loaded Sandwizza", price: 90 }
+    ],
+  },
+  {
+    name: "Pizza",
+    category: "Pizza",
+    variants: [
+      { name: "Margherita Pizza", price: 129 },
+      { name: "Golden Corn  Pizza", price: 149 },
+      { name: "Spicy Veg Pizza", price: 150 },
+      { name: "Onion, Capsicum, Cheese", price: 160 },
+      { name: "Farm House Pizza", price: 189 },
+      { name: "Tandoori Paneer Pizza", price: 189 }
+    ],
+  },
+  {
+    name: "Bhajiya",
+    category: "Bhajiya",
+    variants: [
+      { name: "Kanda Bhajiya", price: 40 },
+      { name: "Potato Bhajiya", price: 40 },
+      { name: "Jain Butter Grilled Bhajiya", price: 50 },
+      { name: "Crispy Potato Sticks", price: 80 },
+      { name: "Crispy Onion Rings", price: 80 },
+      { name: "Crispy Paneer Sticks", price: 100 }
+    ],
+  },
+  {
+    name: "Jain's Special",
+    category: "Jain's Special",
+    variants: [
+      { name: "Masala Sandwich", price: 60 },
+      { name: "Kaccha Sandwich", price: 50 },
+      { name: "Katori Chaat", price: 65 },
+      { name: "Shahi Basket Chaat", price: 70 },
+      { name: "Aloo Tikki Chaat", price: 50 },
+      { name: "Plain Maggi", price: 50 },
+      { name: "Tomato Maggi", price: 60 },
+      { name: "Tawa Pulao", price: 90 },
+      { name: "Bhel", price: 40 },
+      { name: "Salted Fries", price: 50 }
+    ],
+  },
+  {
+    name: "Chaat",
+    category: "Chaat",
+    variants: [
+      { name: "Samosa Chaat", price: 50 },
+      { name: "Chaat Shot", price: 70 },
+      { name: "Chole Tikki Chaat", price: 60 },
+      { name: "Shahi Basket", price: 70 },
+      { name: "Katori Chaat", price: 65 }
+    ],
+  },
+  {
+    name: "Samosa",
+    category: "Samosa",
+    variants: [
+      { name: "Samosa Pav", price: 30 },
+      { name: "Spicy Samosa Pav", price: 35 },
+      { name: "Grilled Samosa Pav", price: 35 },
+      { name: "Cheese Samosa Pav", price: 45 },
+    ],
+  },
+  {
+    name: "Fries",
+    category: "Fries",
+    variants: [
+      { name: "Salted", price: 60 },
+      { name: "Peri-Peri", price: 70 },
+      { name: "BBQ Fries", price: 80 },
+      { name: "Falhari Fries", price: 80 },
+    ],
+  },
+  {
+    name: "Mumbaiya Bhel",
+    category: "Mumbaiya Bhel",
+    variants: [
+      { name: "Bhel Puri", price: 50 },
+      { name: "Teekha Bhel", price: 50 },
+      { name: "Sweet Bhel", price: 50 },
+      { name: "Cheesy Bhel", price: 70 },
+      { name: "Crispy Maggi Bhel", price: 90 },
+    ],
+  },
+  {
+    name: "Chai",
+    category: "Chai",
+    variants: [
+      { name: "Kadak Chai", price: 20 },
+      { name: "Adrak Chai", price: 20 },
+      { name: "Masala Chai", price: 30 },
+      { name: "Elaichi Chai", price: 30 }
+    ],
+  },
+  {
+    name: "Misal Pav",
+    category: "Misal Pav",
+    variants: [
+      { name: "Bombay Misal Pav", price: 80 },
+      { name: "Schezwan Misal Pav", price: 100 },
+      { name: "Dahi Misal Pav", price: 100 },
+      { name: "Cheese Misal Pav", price: 110 }
+    ],
+  },
+  {
+    name: "Coolers's",
+    category: "Coolers's",
+    variants: [
+      { name: "Butter Milk ", price: 40 },
+      { name: "Sweet Lassi", price: 60 },
+      { name: "Salted Lassi", price: 60 }
+    ],
+  },
+  {
+    name: "Refreshment",
+    category: "Refreshment",
+    variants: [
+      { name: "Lime Soda", price: 60 },
+      { name: "Masala Soda", price: 70 },
+      { name: "Cola Lemonade", price: 80 }
+    ],
+  },
+  {
+    name: "Mojito",
+    category: "Mojito",
+    variants: [
+      { name: "Green Apple", price: 90 },
+      { name: "Kala Khatta", price: 90 },
+      { name: "Tangy Mango", price: 90 }
+    ],
+  },
+  {
+    name: "Pav Bhaji",
+    category: "Pav Bhaji",
+    variants: [
+      { name: "Butter Pav Bhaji", price: 90 },
+      { name: "Cheese Pav Bhaji", price: 120 },
+      { name: "Jain Pav Bhaji", price: 95 }
+    ],
+  },
+  {
+    name: "Chole Bhature",
+    category: "Chole Bhature",
+    variants: [
+      { name: "Chole Bhature", price: 95 },
+      { name: "Paneer Chole Bhature", price: 150 },
+      { name: "Jain Chole Bhature", price: 100 }
+    ],
+  },
+  ,
+  {
+    name: "Burger",
+    category: "Burger",
+    variants: [
+      { name: "Aloo Tikki Burger", price: 50 },
+      { name: "Veg Cheese Burger", price: 70 },
+      { name: "Spicy Veg Supreme Burger", price: 70 }
+    ],
+  },
+  {
+    name: "Pulao",
+    category: "Pulao",
+    variants: [
+      { name: "Bombay Tawa Pulao", price: 110 },
+      { name: "Bombay Tawa Pulao (With Bhaji", price: 150 }
+    ],
+  },
+  {
+    name: "Special's ",
+    category: "Special's",
+    variants: [
+      { name: "Aloo Vada", price: 40 },
+      { name: "Dabeli", price: 50 },
+      { name: "Misal Thali", price: 150 },
+      { name: "Masala Pav", price: 80 },
+      { name: "Dhokla Vada Pav", price: 60 },
+      { name: "Sabudana Vada", price: 70 },
+      { name: "Dahi Sabudana Vada", price: 90 },
+      { name: "Chai Thali", price: 129 },
+      { name: "Indori Poha ", price: 30 },
+      { name: "Ussal Poha", price: 40 },
+      { name: "Cold Coffee", price: 50 },
+      { name: "Hot Coffee", price: 50 },
+      { name: "Bun Masaka", price: 30 }
+    ],
+  }
+];
+
 const Menu = () => {
-  const [menuItems, setMenuItems] = useState([]);
-  const [filteredItems, setFilteredItems] = useState([]);
-  const { setOrder } = useContext(OrderContext);
+  const [expanded, setExpanded] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
-  const [expanded, setExpanded] = useState({});
+  const { setOrder } = useContext(OrderContext);
   const [quantities, setQuantities] = useState({});
-
-  useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/menu");
-        setMenuItems(response.data);
-      } catch (error) {
-        console.error("Error fetching menu:", error);
-      }
-    };
-    fetchMenu();
-  }, []);
-
-  useEffect(() => {
-    let filtered = menuItems;
-    if (category !== "All") {
-      filtered = filtered.filter(item => item.category === category);
-    }
-    if (searchQuery) {
-      filtered = filtered.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    }
-    setFilteredItems(filtered);
-  }, [category, searchQuery, menuItems]);
 
   const toggleExpand = (id) => {
     setExpanded((prev) => ({
@@ -164,19 +348,22 @@ const Menu = () => {
 
   const handleAddToCart = (item, variant) => {
     const key = `${item._id}-${variant.name}`;
-    const itemQuantity = quantities[key];
-
+    const itemQuantity = quantities[key] || 0;
     if (itemQuantity === 0) return;
-
     const newItem = {
       ...item,
       selectedVariant: variant.name,
       price: variant.price,
       quantity: itemQuantity,
     };
-
     setOrder((prevOrder) => [...prevOrder, newItem]);
   };
+
+  const filteredItems = menuData.filter(
+    (item) =>
+      (category === "All" || item.category === category) &&
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <MenuContainer>
@@ -190,25 +377,8 @@ const Menu = () => {
         />
         <Select value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="All">All Categories</option>
-          <option value="Vada Pav">Vada Pav</option>
-          <option value="Sandwiches">Sandwiches</option>
-          <option value="Jain's Special">Jain's Special</option>
-          <option value="Pizza">Pizza</option>
-          <option value="Bhajiya">Bhajiya</option>
-          <option value="Mumbaiya Bhel">Mumbaiya Bhel</option>
-          <option value="Misal Pav">Misal Pav</option>
-          <option value="Samosa">Samosa</option>
-          <option value="Chaat">Chaat</option>
-          <option value="Chai">Chai</option>
-          <option value="Pav Bhaji">Pav Bhaji</option>
-          <option value="Chole Bhature">Jain's Special</option>
-          <option value="Fries">Fries</option>
-          <option value="Burger">Jain's Special</option>
-          <option value="Cooler's">Cooler's</option>
           <option value="Refreshment">Refreshment</option>
-          <option value="Mojito">Mojito</option>
-          <option value="Pulao">Pulao</option>
-          <option value="Special's">Special's</option>
+          <option value="Pav Bhaji">Pav Bhaji</option>
         </Select>
       </FiltersContainer>
       <GridContainer>
@@ -221,13 +391,15 @@ const Menu = () => {
             <CollapserContent isOpen={expanded[item._id]}>
               {item.variants.map((variant) => (
                 <Variant key={variant.name}>
-                  <VariantText>{variant.name}</VariantText>
+                  <span>{variant.name}</span>
                   <Price>₹{variant.price}</Price>
                   <QuantityInput
                     type="number"
                     min="0"
                     value={quantities[`${item._id}-${variant.name}`] || 0}
-                    onChange={(e) => handleQuantityChange(item._id, variant.name, parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleQuantityChange(item._id, variant.name, parseInt(e.target.value) || 0)
+                    }
                   />
                   <AddToCartButton onClick={() => handleAddToCart(item, variant)}>
                     Add to Cart
