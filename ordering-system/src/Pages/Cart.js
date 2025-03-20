@@ -206,7 +206,7 @@ const Cart = () => {
         </TermsContainer>
 
         <ButtonContainer>
-          <Button primary disabled={!agreeToTerms} onClick={handlePlaceOrder}>
+          <Button primary disabled>
             Place Order
           </Button>
           <Button onClick={() => navigate("/menu")}>Add More Items</Button>
