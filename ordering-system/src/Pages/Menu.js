@@ -357,14 +357,14 @@ const menuData = [
 ];
 
 const Menu = () => {
-  const [expandedId, setExpandedId] = useState(null);
+  const [expandedId, setExpandedId] = useState(menuData[0]._id)
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
   const { setOrder } = useContext(OrderContext);
   const [quantities, setQuantities] = useState({});
 
   const toggleExpand = (id) => {
-    setExpandedId((prevId) => (prevId === id ? null : id));
+     setExpandedId(expandedId === id ? null : id)
   };
 
   const handleQuantityChange = (itemId, variantName, delta) => {
@@ -378,16 +378,38 @@ const Menu = () => {
   const handleAddToCart = (item, variant) => {
     const key = `${item._id}-${variant.name}`;
     const itemQuantity = quantities[key] || 0;
-    if (itemQuantity === 0) return;
-    const newItem = {
-      ...item,
-      selectedVariant: variant.name,
-      price: variant.price,
-      quantity: itemQuantity,
-    };
-    setOrder((prevOrder) => [...prevOrder, newItem]);
+  
+    if (itemQuantity === 0) return; // Don't add if quantity is 0
+  
+    setOrder((prevOrder) => {
+      const existingIndex = prevOrder.findIndex(
+        (orderItem) => orderItem._id === item._id && orderItem.selectedVariant === variant.name
+      );
+  
+      if (existingIndex !== -1) {
+        // If item already exists, update its quantity instead of adding a new entry
+        const updatedOrder = [...prevOrder];
+        updatedOrder[existingIndex] = {
+          ...updatedOrder[existingIndex],
+          quantity: itemQuantity,
+        };
+        return updatedOrder;
+      } else {
+        // Add new item with proper variant name
+        return [
+          ...prevOrder,
+          {
+            ...item,
+            name: `${item.name} (${variant.name})`, // Ensure variant is displayed
+            price: variant.price,
+            quantity: itemQuantity,
+            selectedVariant: variant.name,
+          },
+        ];
+      }
+    });
   };
-
+  
   const filteredItems = menuData.filter(
     (item) =>
       (category === "All" || item.category === category) &&
