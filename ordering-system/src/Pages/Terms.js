@@ -328,7 +328,7 @@ const TermsAndConditions = () => {
 
         <SubHeading>Return and Refund policy</SubHeading>
         <Paragraph>
-          Return We have a 1-day return policy, which means you have 1 days
+          Return We have a 1 day return policy, which means you have 1 days
           after receiving your item to request a return. Once the return product
           is received it will be inspected and the return will be approved
           within 2 days
